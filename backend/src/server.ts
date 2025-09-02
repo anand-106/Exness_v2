@@ -3,8 +3,9 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 import cookieParser from "cookie-parser";
-
+import tradeRouter from "./Routes/trades";
 import sgMail from "@sendgrid/mail";
+import { AuthMiddleware } from "./jwt";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
@@ -75,6 +76,10 @@ app.get("/api/v1/verify", (req, res) => {
   //   res.cookie("token", token);
   //   res.json({ email });
 });
+
+app.use(AuthMiddleware);
+
+app.use("/api/v1/trade", tradeRouter);
 
 app.listen(PORT, () => {
   console.log("app running on port ", PORT);

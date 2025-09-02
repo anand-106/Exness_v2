@@ -53,19 +53,19 @@ ws.on("message", (msg) => {
   if (data.s == "SOL_USDC") {
     SOLtradeData = {
       asset: "SOL",
-      price: data.a,
+      price: parseInt(data.a) * 1000000,
       decimal: 6,
     };
   } else if (data.s == "ETH_USDC") {
     ETHtradeData = {
       asset: "ETH",
-      price: data.a,
+      price: parseInt(data.a) * 1000000,
       decimal: 6,
     };
   } else if (data.s == "BTC_USDC") {
     BTCtradeData = {
       asset: "BTC",
-      price: data.a,
+      price: parseInt(data.a) * 10000,
       decimal: 4,
     };
   }
