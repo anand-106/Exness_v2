@@ -6,6 +6,8 @@ import cookieParser from "cookie-parser";
 import tradeRouter from "./Routes/trades";
 import sgMail from "@sendgrid/mail";
 import { AuthMiddleware } from "./jwt";
+import { creteBalance } from "./utils/pushOrder";
+import { v4 as uuidv4 } from "uuid";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
@@ -16,6 +18,11 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+
+type userData = {
+  email: string;
+  userId: string;
+};
 
 app.get("/", (req, res) => {
   res.json("hello world");
@@ -45,7 +52,7 @@ app.post("/api/v1/signup", (req, res) => {
 app.post("/api/v1/signin", async (req, res) => {
   const { email } = req.body;
 
-  const token = jwt.sign({ email }, JWT_SECRET);
+  const token = jwt.sign({ id: email }, JWT_SECRET);
 
   const LINK = `http://localhost:3000/auth/verify?token=${token}`;
 
@@ -63,12 +70,12 @@ app.post("/api/v1/signin", async (req, res) => {
   }
 });
 
-app.get("/api/v1/verify", (req, res) => {
+app.get("/api/v1/verify", async (req, res) => {
   const { token } = req.query;
 
-  const { email } = jwt.verify(token as string, JWT_SECRET) as any;
+  const { id } = jwt.verify(token as string, JWT_SECRET) as any;
 
-  if (!email) res.status(401).json({ message: "Invalid token" });
+  if (!id) res.status(401).json({ message: "Invalid token" });
 
   res.setHeader("Set-Cookie", `token=${token}; Max-Age=3600`); // Cookie expires in 1 hour
   res.send("Cookie set successfully");

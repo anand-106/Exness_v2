@@ -15,7 +15,7 @@ export function AuthMiddleware(
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    (req as any).email = (decoded as any).email;
+    (req as any).id = (decoded as any).id;
 
     next();
   } catch (e) {

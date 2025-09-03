@@ -17,14 +17,14 @@ router.post(
   "/create",
   async (req: Request<{}, {}, TradeCreateReq, {}>, res) => {
     const TradeOptions = req.body;
-    const email = (req as any).email;
+    const id = (req as any).id;
 
     const orderId = uuidv4();
 
     const OrderQueueItem: OrderQueue = {
       asset: TradeOptions.asset,
       orderId: orderId,
-      email: email,
+      userId: id,
       type: TradeOptions.type,
       margin: TradeOptions.margin,
       leverage: TradeOptions.leverage,

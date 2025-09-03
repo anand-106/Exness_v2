@@ -8,3 +8,10 @@ export type OpenOrder = {
   asset: "BTC" | "ETH" | "SOL";
   email: string;
 };
+
+export type AssetBalance = {
+  balance: number;
+  decimals: number;
+};
+
+export type BalanceAssets = "USD" | "ETH" | "BTC" | "SOL";

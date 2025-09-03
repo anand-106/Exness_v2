@@ -5,40 +5,29 @@ import { OpenOrder } from "./types/types";
 
 const OpenOrders: Record<string, OpenOrder> = {};
 
-const connection = new Redis({
-  maxRetriesPerRequest: null,
-});
+const client = new Redis();
 
-const worker = new Worker(
-  "order-queue",
-  async (job) => {
-    if (job.name == "create") {
-      const { leverage, slippage, type, asset, email, orderId, margin } =
-        job.data;
+async function main() {
+  while (true) {
+    const stream = await client.xread(
+      "BLOCK",
+      0,
+      "STREAMS",
+      "create-order",
+      "$"
+    );
 
-      const CurrentPrice = PRICES[asset]!.price;
+    if (!stream) continue;
 
-      const qty = (margin * leverage) / CurrentPrice;
-
-      OpenOrders[orderId] = {
-        openPrice: CurrentPrice,
-        type,
-        leverage,
-        asset,
-        email,
-        slippage,
-        qty,
-        margin,
-      };
-
-      console.log(OpenOrders[orderId]);
+    const [streamName, message] = stream[0] as any;
+    for (const [id, data] of message) {
+      const [name, orderRawData] = data;
+      const orderData = JSON.parse(orderRawData);
+      console.log(orderData);
     }
-  },
-  { connection }
-);
+  }
+}
 
-worker.on("completed", () => {
-  console.log("order completed");
-});
+main();
 
 // worker.on('error')
