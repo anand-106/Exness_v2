@@ -1,4 +1,5 @@
 import { Redis } from "ioredis";
+import "./getOrderQueue";
 
 type Trade = {
   price: number;
@@ -11,7 +12,7 @@ type PPTrade = {
   decimal: number;
 };
 
-const PRICES: Record<string, Trade> = {};
+export const PRICES: Record<string, Trade> = {};
 
 const redis = new Redis();
 
@@ -28,7 +29,7 @@ redis.on("error", () => {
 });
 
 redis.subscribe("price_updates", (err, count) => {
-  console.log("error subscribing ", err);
+  if (err) console.log("error subscribing ", err);
 });
 
 redis.on("message", (channel, msg) => {
@@ -41,5 +42,5 @@ redis.on("message", (channel, msg) => {
     };
   });
 
-  console.log(PRICES);
+  //   console.log(PRICES);
 });
