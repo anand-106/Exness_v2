@@ -1,6 +1,9 @@
-import { client } from "./getOrderQueue";
+import Redis from "ioredis";
 
+const returnClient = new Redis()
 
 export async function returnOrderId(orderData:any){
-    await client.xadd("create-order", "*", "orderId", orderData.orderId);
+
+    await returnClient.xadd("return-orderId", "*", "orderId", orderData.orderId);
+    console.log("returned order id")
 }

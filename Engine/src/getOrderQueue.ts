@@ -43,6 +43,8 @@ async function main() {
         status:"open"
       }
 
+      console.log("order created")
+
       USER_BALANCES[orderData.userId]![orderData.asset].balance=qty
 
       // console.log(OpenOrders)

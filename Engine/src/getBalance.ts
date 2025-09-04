@@ -50,19 +50,21 @@ export async function sendBalance(){
     try{
         let userBalance;
         let userId;
+        let lastId = '$'
         console.log("listening for balace request")
         while(true){
-            const stream =  await client.xread('BLOCK',0,"STREAMS",'user-balance','$')
+            const stream =  await client.xread('BLOCK',0,"STREAMS",'balance-request',lastId)
             
             const [streamName, message] = stream![0] as any;
             for (const [id, data] of message) {
+                lastId = id
                 const [name, rawUserId] = data;
                 if(name=='userId')
                     {
                         userId = rawUserId
                         console.log("balance request received for user ",userId)
                         userBalance = USER_BALANCES[userId]
-                        await balanceClient.xadd('user-balance','*','balance',JSON.stringify(userBalance))
+                        await balanceClient.xadd('balance-response','*','balance',JSON.stringify(userBalance))
                         console.log("user balance sent of user ",userId,userBalance)
             }
            }
