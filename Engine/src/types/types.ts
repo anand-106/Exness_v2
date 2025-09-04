@@ -6,7 +6,9 @@ export type OpenOrder = {
   leverage: number;
   slippage: number;
   asset: "BTC" | "ETH" | "SOL";
-  email: string;
+  userId: string;
+  pnl?:number;
+  status: "open" | "closed" | "liquidated"
 };
 
 export type AssetBalance = {
@@ -14,4 +16,17 @@ export type AssetBalance = {
   decimals: number;
 };
 
-export type BalanceAssets = "USD" | "ETH" | "BTC" | "SOL";
+
+
+export type BalanceAssets = "USD" | "ETH" | "BTC" | "SOL" ;
+
+export type OrderQueue = {
+  asset: "BTC" | "ETH" | "SOL";
+  orderId: string;
+  userId: string;
+  type: "long" | "short";
+  margin: number;
+  leverage: number;
+  slippage: number;
+};
+

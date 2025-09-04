@@ -16,11 +16,4 @@ export async function pushOrder(order: OrderQueue) {
   }
 }
 
-export async function creteBalance(email: string, userId: string) {
-  try {
-    await client.xadd("create-balance", JSON.stringify({ email, userId }));
-    console.log("balance creation request goen for emial : ", email);
-  } catch (e) {
-    console.log(e);
-  }
-}
+

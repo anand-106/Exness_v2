@@ -6,8 +6,9 @@ import cookieParser from "cookie-parser";
 import tradeRouter from "./Routes/trades";
 import sgMail from "@sendgrid/mail";
 import { AuthMiddleware } from "./jwt";
-import { creteBalance } from "./utils/pushOrder";
 import { v4 as uuidv4 } from "uuid";
+import { creteBalance } from "./utils/createBalance";
+import { getBalance } from "./utils/getBalance";
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
@@ -23,6 +24,8 @@ type userData = {
   email: string;
   userId: string;
 };
+
+
 
 app.get("/", (req, res) => {
   res.json("hello world");
@@ -77,9 +80,12 @@ app.get("/api/v1/verify", async (req, res) => {
 
   if (!id) res.status(401).json({ message: "Invalid token" });
 
+  await creteBalance(id)
+
   res.setHeader("Set-Cookie", `token=${token}; Max-Age=3600`); // Cookie expires in 1 hour
   res.send("Cookie set successfully");
 
+ 
   //   res.cookie("token", token);
   //   res.json({ email });
 });
@@ -87,6 +93,13 @@ app.get("/api/v1/verify", async (req, res) => {
 app.use(AuthMiddleware);
 
 app.use("/api/v1/trade", tradeRouter);
+
+app.get('/api/v1/balance',async (req,res)=>{
+  const userId = (req as any).id;
+  console.log("balance endpoint hit")
+  const userBalance = await getBalance(userId)
+  res.json(userBalance)
+})
 
 app.listen(PORT, () => {
   console.log("app running on port ", PORT);
