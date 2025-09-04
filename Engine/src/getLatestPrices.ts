@@ -1,4 +1,5 @@
-import { client } from "./getOrderQueue";
+import Redis from "ioredis";
+
 
 
 type Trade = {
@@ -14,11 +15,13 @@ type Trade = {
 
 export const PRICES: Record<string, Trade> = {};
 
+const PriceClient  = new Redis()
+
 export async function getLatestPrices() {
 
     
     while(true){
-        const stream = await client.xread("BLOCK",0,"STREAMS",'latest-prices','$')
+        const stream = await PriceClient.xread("BLOCK",0,"STREAMS",'latest-prices','$')
 
         if (!stream) continue;
 
@@ -26,14 +29,13 @@ export async function getLatestPrices() {
         for (const [id, data] of message) {
           const [name, rawPrices] = data;
           const trades: PPTrade[] = JSON.parse(rawPrices).price_updates;
-          console.log("trades are ",trades)
+          
           trades.map(trade=>{
             PRICES[trade.asset] = {
                 price: trade.price,
                 decimal: trade.decimal,
               };
           })
-          console.log(PRICES)
         }
     }
 }
