@@ -1,11 +1,12 @@
 import { Redis } from "ioredis";
-import { Worker } from "bullmq";
-import { PRICES } from "./server";
+import { PRICES } from "./getLatestPrices";
 import { OpenOrder } from "./types/types";
+import { v4 as uuidv4 } from "uuid";
+import { returnOrderId } from "./returnOrderId";
 
 const OpenOrders: Record<string, OpenOrder> = {};
 
-const client = new Redis();
+export const client = new Redis();
 
 async function main() {
   while (true) {
@@ -24,6 +25,8 @@ async function main() {
       const [name, orderRawData] = data;
       const orderData = JSON.parse(orderRawData);
       console.log(orderData);
+
+      await returnOrderId(orderData)
     }
   }
 }

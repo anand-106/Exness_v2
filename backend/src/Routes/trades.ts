@@ -31,9 +31,11 @@ router.post(
       slippage: TradeOptions.slippage,
     };
 
-    await pushOrder(OrderQueueItem);
+    const orderIdAck = await pushOrder(OrderQueueItem);
 
-    res.json({ orderId });
+    console.log(orderIdAck);
+    if(orderIdAck) return res.json({ orderId: orderIdAck });
+    else return res.status(500).json({message:"error executing order"})
   }
 );
 

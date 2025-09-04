@@ -80,5 +80,7 @@ setInterval(async () => {
 }, 100);
 
 async function pricePoll(pricesData: Prices) {
-  await redis.publish("price_updates", JSON.stringify(pricesData));
+  console.log("injecting data to queue",pricesData)
+
+  await redis.xadd('latest-prices','*','data',JSON.stringify(pricesData))
 }
