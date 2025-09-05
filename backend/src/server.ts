@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import { creteBalance } from "./utils/createBalance";
 import { getBalance } from "./utils/getBalance";
 
+
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 const PORT = 4000;
@@ -24,6 +25,8 @@ type userData = {
   email: string;
   userId: string;
 };
+
+
 
 
 

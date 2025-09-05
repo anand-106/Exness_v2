@@ -21,6 +21,7 @@ export type AssetBalance = {
 export type BalanceAssets = "USD" | "ETH" | "BTC" | "SOL" ;
 
 export type OrderQueue = {
+  mode:string,
   asset: "BTC" | "ETH" | "SOL";
   orderId: string;
   userId: string;

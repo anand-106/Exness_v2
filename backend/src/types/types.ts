@@ -1,4 +1,5 @@
 export type OrderQueue = {
+  mode:string
   asset: "BTC" | "ETH" | "SOL";
   orderId: string;
   userId: string;

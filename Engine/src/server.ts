@@ -1,7 +1,8 @@
-import { Redis } from "ioredis";
-import "./getOrderQueue";
+
 import { getLatestPrices } from "./getLatestPrices";
-import { getBalance, sendBalance } from "./getBalance";
+import "./getOrderQueue";
+import './services/popData'
+
 
 type Trade = {
   price: number;
@@ -16,8 +17,6 @@ type PPTrade = {
 
 
 async function main() {
-   getLatestPrices().catch(console.error)
-   getBalance().catch(console.error)
-   sendBalance().catch(console.error)
+  getLatestPrices().catch(console.error)
 }
 main()

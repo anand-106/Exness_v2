@@ -12,8 +12,8 @@
   "dependencies": {
     "bullmq": "^5.58.4",
     "ioredis": "^5.7.0",
+    "redis": "^5.8.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.2",
     "uuid": "^11.1.0"
   }
 }

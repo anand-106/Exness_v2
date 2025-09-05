@@ -1,7 +1,8 @@
 import { Router, Request } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { OrderQueue } from "../types/types";
-import { pushOrder } from "../utils/pushOrder";
+import { pushOrder } from "../services/pushData";
+import { RedisSubscriber } from "../services/redisSubscriber";
 
 const router = Router();
 
@@ -13,6 +14,8 @@ type TradeCreateReq = {
   slippage: number;
 };
 
+const redisSubscriber = new RedisSubscriber()
+
 router.post(
   "/create",
   async (req: Request<{}, {}, TradeCreateReq, {}>, res) => {
@@ -22,6 +25,7 @@ router.post(
     const orderId = uuidv4();
 
     const OrderQueueItem: OrderQueue = {
+      mode:"create-order",
       asset: TradeOptions.asset,
       orderId: orderId,
       userId: id,
@@ -31,11 +35,13 @@ router.post(
       slippage: TradeOptions.slippage,
     };
 
-    const orderIdAck = await pushOrder(OrderQueueItem);
+    
+    await pushOrder(OrderQueueItem)
 
-    console.log(orderIdAck);
-    if(orderIdAck) return res.json({ orderId: orderIdAck });
-    else return res.status(500).json({message:"error executing order"})
+    const orderIdRes = await redisSubscriber.waitForMeassage(orderId)
+
+    res.json({orderId:orderIdRes})
+    
   }
 );
 

@@ -23,7 +23,7 @@ async function main() {
 
     const [streamName, message] = stream[0] as any;
     for (const [id, data] of message) {
-      const [name, orderRawData] = data;
+      const [id1,id, orderRawData] = data;
       const orderData:OrderQueue = JSON.parse(orderRawData);
       // console.log(orderData);
 
