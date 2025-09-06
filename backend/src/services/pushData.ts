@@ -5,7 +5,7 @@ import { OrderQueue } from "../types/types";
 
 import { client } from "../server";
 
-export const CREATE_ORDER_QUEUE = "trade-stream"
+export const TRADE_QUEUE = "trade-stream"
 
 export async function pushOrder(data:OrderQueue){
 
@@ -14,7 +14,7 @@ export async function pushOrder(data:OrderQueue){
         
         console.log("sending message to the queue")
         
-        await client.xAdd(CREATE_ORDER_QUEUE,"*",{
+        await client.xAdd(TRADE_QUEUE,"*",{
             message:JSON.stringify(data)
         })
         

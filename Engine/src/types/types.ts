@@ -7,7 +7,8 @@ export type OpenOrder = {
   slippage: number;
   asset: "BTC" | "ETH" | "SOL";
   userId: string;
-  pnl?:number;
+  closePrice?:number;
+  pnl:number;
   status: "open" | "closed" | "liquidated"
 };
 

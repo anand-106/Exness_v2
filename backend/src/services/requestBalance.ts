@@ -1,6 +1,6 @@
 import { client } from "../server";
 
-import { CREATE_ORDER_QUEUE } from "./pushData";
+import { TRADE_QUEUE } from "./pushData";
 
 export async  function  reqBalance(id:string,userId:string){
 
@@ -8,7 +8,7 @@ export async  function  reqBalance(id:string,userId:string){
         
         console.log("balance request sending to queue")
 
-        await client.xAdd(CREATE_ORDER_QUEUE,"*",{
+        await client.xAdd(TRADE_QUEUE,"*",{
             message:JSON.stringify({
                 mode:"balance",
                 id:id,

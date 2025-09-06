@@ -2,6 +2,7 @@ import { Router, Request } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { OrderQueue } from "../types/types";
 import { pushOrder } from "../services/pushData";
+import {closeOrder} from '../services/closeOrder'
 import { RedisSubscriber } from "../services/redisSubscriber";
 
 const router = Router();
@@ -44,5 +45,18 @@ router.post(
     
   }
 );
+
+router.post('/close',async (req,res)=>{
+  const{ orderId  }   = req.body
+
+  const id = uuidv4()
+
+  await closeOrder(id,orderId)
+
+  const data = await redisSubscriber.waitForMeassage(id) as string
+
+  res.json(JSON.parse(data))
+
+})
 
 export default router;

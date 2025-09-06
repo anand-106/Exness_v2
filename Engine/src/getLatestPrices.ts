@@ -1,4 +1,5 @@
 import Redis from "ioredis";
+import { OpenOrders } from "./services/popData";
 
 
 
@@ -35,6 +36,19 @@ export async function getLatestPrices() {
                 price: trade.price,
                 decimal: trade.decimal,
               };
+          })
+
+          Object.entries(OpenOrders).forEach(([orderID,order])=>{
+            let pnl = 0;
+            if(order.type=="long"){
+               pnl = (PRICES[order.asset]!.price - order.openPrice)*order.qty
+            }else{
+              pnl = (order.openPrice -PRICES[order.asset]!.price  )*order.qty
+            }
+
+            order.pnl = pnl
+            order.closePrice = PRICES[order.asset]!.price
+            
           })
         }
     }

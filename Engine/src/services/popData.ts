@@ -6,7 +6,7 @@ const client = createClient();
 
 client.connect();
 
-const OpenOrders: Record<string, OpenOrder> = {};
+export const OpenOrders: Record<string, OpenOrder> = {};
 export const USER_BALANCES :Record<string,Record<BalanceAssets,AssetBalance>> = {}
 
 client.on("connect", async () => {
@@ -44,6 +44,7 @@ client.on("connect", async () => {
         asset: orderData.asset,
         userId: orderData.userId,
         status: "open",
+        pnl:0
       };
       console.log("received order ", OpenOrders[orderData.orderId]);
 
@@ -92,6 +93,31 @@ client.on("connect", async () => {
         data: JSON.stringify(USER_BALANCES[userId])
       });
 
+    }
+    else if(Data.mode=="close"){
+      const {id,OrderId} = Data
+      console.log("received order close request for order ",OrderId)
+
+      const order = OpenOrders[OrderId]
+
+      if(!order) return
+
+      const pnl = order.pnl
+
+      console.log("the pnl is ",pnl)
+
+      order.status = "closed"
+
+      USER_BALANCES[order.userId]!.USD.balance += pnl
+
+      const balance = USER_BALANCES[order.userId]!.USD.balance 
+
+      console.log(order)
+
+      client.xAdd("callback-queue", "*", {
+        id: id,
+        data: JSON.stringify({balance})
+      });
     }
   }
 });

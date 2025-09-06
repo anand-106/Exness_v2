@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import cookieParser from "cookie-parser";
 import tradeRouter from "./Routes/trades";
+import BalanceRouter from './Routes/balance'
 import sgMail from "@sendgrid/mail";
 import { AuthMiddleware } from "./jwt";
 import { v4 as uuidv4 } from "uuid";
@@ -104,18 +105,20 @@ app.use(AuthMiddleware);
 
 app.use("/api/v1/trade", tradeRouter);
 
-app.get('/api/v1/balance',async (req,res)=>{
-  const userId = (req as any).id;
-  console.log("balance endpoint hit")
+// app.get('/api/v1/balance',async (req,res)=>{
+//   const userId = (req as any).id;
+//   console.log("balance endpoint hit")
 
-  const id = uuidv4()
+//   const id = uuidv4()
   
- await reqBalance(id,userId)
+//  await reqBalance(id,userId)
 
- const balanceRes = await redisSubscriber.waitForMeassage(id) as string
+//  const balanceRes = await redisSubscriber.waitForMeassage(id) as string
 
- res.json(JSON.parse(balanceRes))
-})
+//  res.json(JSON.parse(balanceRes))
+// })
+
+app.use('/api/v1/balance',BalanceRouter)
 
 app.listen(PORT, () => {
   console.log("app running on port ", PORT);
