@@ -3,8 +3,7 @@ import { createClient } from "redis";
 import { OrderQueue } from "../types/types";
 
 
-const client = createClient()
-client.connect();
+import { client } from "../server";
 
 export const CREATE_ORDER_QUEUE = "trade-stream"
 

@@ -9,6 +9,12 @@ import { AuthMiddleware } from "./jwt";
 import { v4 as uuidv4 } from "uuid";
 import { creteBalance } from "./utils/createBalance";
 import { getBalance } from "./utils/getBalance";
+import {createClient} from 'redis'
+import { reqBalance } from "./services/requestBalance";
+import { redisSubscriber } from "./Routes/trades";
+
+export const client = createClient()
+client.connect();
 
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
@@ -25,6 +31,7 @@ type userData = {
   email: string;
   userId: string;
 };
+
 
 
 
@@ -100,8 +107,14 @@ app.use("/api/v1/trade", tradeRouter);
 app.get('/api/v1/balance',async (req,res)=>{
   const userId = (req as any).id;
   console.log("balance endpoint hit")
-  const userBalance = await getBalance(userId)
-  res.json(userBalance)
+
+  const id = uuidv4()
+  
+ await reqBalance(id,userId)
+
+ const balanceRes = await redisSubscriber.waitForMeassage(id) as string
+
+ res.json(JSON.parse(balanceRes))
 })
 
 app.listen(PORT, () => {

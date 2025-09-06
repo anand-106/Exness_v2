@@ -14,7 +14,7 @@ type TradeCreateReq = {
   slippage: number;
 };
 
-const redisSubscriber = new RedisSubscriber()
+export const redisSubscriber = new RedisSubscriber()
 
 router.post(
   "/create",

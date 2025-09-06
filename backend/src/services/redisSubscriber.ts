@@ -41,10 +41,11 @@ export class RedisSubscriber {
 
       const id = messages[0].message.id
 
-      console.log(id)
+      console.log("Received callback for order:", id)
 
-      
-      this.callbacks[id]!()
+      const data = messages[0].message.data
+
+      this.callbacks[id]!(data)
     }
   }
 

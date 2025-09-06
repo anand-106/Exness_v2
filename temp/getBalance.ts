@@ -3,7 +3,7 @@ import Redis from "ioredis";
 import { AssetBalance, BalanceAssets } from "./types/types";
 
 
-
+export const USER_BALANCES :Record<string,Record<BalanceAssets,AssetBalance>> = {}
 
 const client = new Redis()
 

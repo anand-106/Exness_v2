@@ -1,6 +1,6 @@
 
 import { getLatestPrices } from "./getLatestPrices";
-import "./getOrderQueue";
+// import "./getOrderQueue";
 import './services/popData'
 
 

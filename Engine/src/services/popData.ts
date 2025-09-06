@@ -1,5 +1,5 @@
 import { createClient } from "redis";
-import { OpenOrder, OrderQueue } from "../types/types";
+import { AssetBalance, BalanceAssets, OpenOrder, OrderQueue } from "../types/types";
 import { PRICES } from "../getLatestPrices";
 
 const client = createClient();
@@ -7,6 +7,7 @@ const client = createClient();
 client.connect();
 
 const OpenOrders: Record<string, OpenOrder> = {};
+export const USER_BALANCES :Record<string,Record<BalanceAssets,AssetBalance>> = {}
 
 client.on("connect", async () => {
   while (1) {
@@ -25,9 +26,10 @@ client.on("connect", async () => {
     const streamData = response[0] as { name: string; messages: any[] };
     const { name: streamName, messages } = streamData;
 
-    const orderData: OrderQueue = JSON.parse(messages[0].message.message);
+    const Data: any = JSON.parse(messages[0].message.message);
 
-    if (orderData.mode == "create-order") {
+    if (Data.mode == "create-order") {
+      const orderData = Data as OrderQueue
       const price = PRICES[orderData.asset]!.price;
 
       const qty = (orderData.margin * orderData.leverage) / price;
@@ -45,12 +47,51 @@ client.on("connect", async () => {
       };
       console.log("received order ", OpenOrders[orderData.orderId]);
 
+      USER_BALANCES[orderData.userId]![orderData.asset].balance=qty
+
       client.xAdd("callback-queue", "*", {
         id: orderData.orderId,
+        data: orderData.orderId
       });
 
       console.log("order id sent back");
       
+    }
+    else if(Data.mode == "balance"){
+      const {id,userId} = Data;
+
+
+      console.log("received balance request of id :",userId)
+
+      if(!USER_BALANCES[userId]){
+        console.log("Creating balance for user:", userId);
+        USER_BALANCES[userId] = {
+            'USD':{
+                balance:500000,
+                decimals:2
+            },
+            'BTC':{
+                balance:0,
+                decimals:4
+            },
+            'ETH':{
+                balance:0,
+                decimals:6
+            },
+            "SOL":{
+                balance:0,
+                decimals:6
+            }
+        }
+        console.log("user balance created ",USER_BALANCES)
+
+      }
+
+      client.xAdd("callback-queue", "*", {
+        id: id,
+        data: JSON.stringify(USER_BALANCES[userId])
+      });
+
     }
   }
 });
