@@ -24,6 +24,8 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
+app.use('/assets', express.static('assets'));
+
 
 
 app.get("/", (req, res) => {
@@ -83,6 +85,28 @@ app.get("/api/v1/verify", async (req, res) => {
   res.send("Cookie set successfully");
 
 
+});
+
+app.get("/api/v1/supportedAssets", (req, res) => {
+  const assets = [
+    {
+      symbol: "BTC",
+      name: "Bitcoin",
+      imageUrl: `http://localhost:${PORT}/assets/btclogo.png`
+    },
+    {
+      symbol: "ETH", 
+      name: "Ethereum",
+      imageUrl: `http://localhost:${PORT}/assets/ethereum-eth-logo.png`
+    },
+    {
+      symbol: "SOL",
+      name: "Solana", 
+      imageUrl: `http://localhost:${PORT}/assets/Solana_logo.png`
+    }
+  ];
+  
+  res.json({ assets });
 });
 
 app.use(AuthMiddleware);
