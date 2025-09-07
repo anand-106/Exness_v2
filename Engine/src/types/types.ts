@@ -32,3 +32,16 @@ export type OrderQueue = {
   slippage: number;
 };
 
+export type SnapShot ={
+  timestamp: number,
+  offset_id: string,
+  open_orders: Record<string, OpenOrder>,
+  user_balances:  Record<string,Record<BalanceAssets,AssetBalance>>
+}
+
+export type SnapshotMetadata = {
+  latestSnapshotId : string,
+  lastSnapshotTime : number,
+  latestSnapshotOffsetId: string
+}
+

@@ -1,6 +1,7 @@
 import { createClient } from "redis";
 import { AssetBalance, BalanceAssets, OpenOrder, OrderQueue } from "../types/types";
 import { PRICES } from "../getLatestPrices";
+import { SnapshotService } from "./SnapshotService";
 
 const client = createClient();
 
@@ -8,13 +9,33 @@ client.connect();
 
 export const OpenOrders: Record<string, OpenOrder> = {};
 export const USER_BALANCES :Record<string,Record<BalanceAssets,AssetBalance>> = {}
+let lastId = '$'
+
+async function initializeFromSnapshot() {
+  
+  const {snapshot,snapshotId} = await SnapshotService.loadLatestSnapshot()
+
+  if(snapshot){
+    Object.assign(OpenOrders,snapshot.open_orders)
+    Object.assign(USER_BALANCES,snapshot.user_balances)
+    lastId = snapshot.offset_id
+    console.log("restored snapshot")
+  }else{
+
+    console.log("snapshot not found")
+  
+}
+
+}
+
 
 client.on("connect", async () => {
+  await initializeFromSnapshot();
   while (1) {
     const response = await client.xRead(
       {
         key: "trade-stream",
-        id: "$",
+        id: lastId,
       },
       {
         BLOCK: 0,
@@ -96,6 +117,7 @@ client.on("connect", async () => {
     }
     else if(Data.mode=="close"){
       const {id,OrderId} = Data
+      lastId = id
       console.log("received order close request for order ",OrderId)
 
       const order = OpenOrders[OrderId]
@@ -108,7 +130,9 @@ client.on("connect", async () => {
 
       order.status = "closed"
 
-      USER_BALANCES[order.userId]!.USD.balance += pnl
+      USER_BALANCES[order.userId]!.USD.balance += pnl/(10**(PRICES[order.asset]!.decimal-USER_BALANCES[order.userId]!.USD.decimals))
+
+      USER_BALANCES[order.userId]![order.asset].balance -= order.qty
 
       const balance = USER_BALANCES[order.userId]!.USD.balance 
 
@@ -121,3 +145,7 @@ client.on("connect", async () => {
     }
   }
 });
+
+setInterval(()=>{
+  SnapshotService.saveSnapshot(OpenOrders,USER_BALANCES,lastId)
+},10000)

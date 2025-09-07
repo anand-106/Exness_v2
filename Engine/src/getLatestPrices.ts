@@ -46,7 +46,7 @@ export async function getLatestPrices() {
               pnl = (order.openPrice -PRICES[order.asset]!.price  )*order.qty
             }
 
-            order.pnl = pnl
+            order.pnl = Math.trunc(pnl)
             order.closePrice = PRICES[order.asset]!.price
             
           })
