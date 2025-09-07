@@ -18,7 +18,7 @@ async function initializeFromSnapshot() {
   if(snapshot){
     Object.assign(OpenOrders,snapshot.open_orders)
     Object.assign(USER_BALANCES,snapshot.user_balances)
-    lastId = snapshot.offset_id
+    lastId = snapshot.offset_id ? snapshot.offset_id : '$'
     console.log("restored snapshot")
   }else{
 
@@ -47,6 +47,8 @@ client.on("connect", async () => {
     const streamData = response[0] as { name: string; messages: any[] };
     const { name: streamName, messages } = streamData;
 
+    lastId =messages[0].id
+
     const Data: any = JSON.parse(messages[0].message.message);
 
     if (Data.mode == "create-order") {
@@ -69,7 +71,7 @@ client.on("connect", async () => {
       };
       console.log("received order ", OpenOrders[orderData.orderId]);
 
-      USER_BALANCES[orderData.userId]![orderData.asset].balance=qty
+      USER_BALANCES[orderData.userId]![orderData.asset].balance +=qty
 
       client.xAdd("callback-queue", "*", {
         id: orderData.orderId,
@@ -117,7 +119,7 @@ client.on("connect", async () => {
     }
     else if(Data.mode=="close"){
       const {id,OrderId} = Data
-      lastId = id
+     
       console.log("received order close request for order ",OrderId)
 
       const order = OpenOrders[OrderId]

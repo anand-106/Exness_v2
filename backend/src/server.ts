@@ -7,12 +7,8 @@ import tradeRouter from "./Routes/trades";
 import BalanceRouter from './Routes/balance'
 import sgMail from "@sendgrid/mail";
 import { AuthMiddleware } from "./jwt";
-import { v4 as uuidv4 } from "uuid";
-import { creteBalance } from "./utils/createBalance";
-import { getBalance } from "./utils/getBalance";
 import {createClient} from 'redis'
-import { reqBalance } from "./services/requestBalance";
-import { redisSubscriber } from "./Routes/trades";
+
 
 export const client = createClient()
 client.connect();
@@ -27,14 +23,6 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-
-type userData = {
-  email: string;
-  userId: string;
-};
-
-
-
 
 
 
@@ -91,32 +79,15 @@ app.get("/api/v1/verify", async (req, res) => {
 
   if (!id) res.status(401).json({ message: "Invalid token" });
 
-  await creteBalance(id)
-
-  res.setHeader("Set-Cookie", `token=${token}; Max-Age=3600`); // Cookie expires in 1 hour
+  res.setHeader("Set-Cookie", `token=${token}; Max-Age=3600`); 
   res.send("Cookie set successfully");
 
- 
-  //   res.cookie("token", token);
-  //   res.json({ email });
+
 });
 
 app.use(AuthMiddleware);
 
 app.use("/api/v1/trade", tradeRouter);
-
-// app.get('/api/v1/balance',async (req,res)=>{
-//   const userId = (req as any).id;
-//   console.log("balance endpoint hit")
-
-//   const id = uuidv4()
-  
-//  await reqBalance(id,userId)
-
-//  const balanceRes = await redisSubscriber.waitForMeassage(id) as string
-
-//  res.json(JSON.parse(balanceRes))
-// })
 
 app.use('/api/v1/balance',BalanceRouter)
 
